@@ -8,6 +8,7 @@ import static seedu.address.logic.parser.CliSyntax.PREFIX_REMARK;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_START_DATETIME;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -22,11 +23,13 @@ import seedu.address.model.activity.Remark;
 import seedu.address.model.tag.Tag;
 
 //@@author Kyomian
-
 /**
  * Parses input arguments and creates a new EventCommand object
  */
 public class EventCommandParser implements Parser<EventCommand> {
+
+    public static final String MESSAGE_INVALID_TIME_RANGE = "Start Datetime cannot be after end Datetime";
+
     /**
      * Parses the given {@code String} of arguments in the context of the EventCommand
      * and returns a EventCommand object for execution.
@@ -46,11 +49,15 @@ public class EventCommandParser implements Parser<EventCommand> {
             Name name = ParserUtil.parseName(argMultimap.getValue(PREFIX_NAME)).get();
             DateTime startDateTime = ParserUtil.parseDateTime(argMultimap.getValue(PREFIX_START_DATETIME)).get();
             DateTime endDateTime = ParserUtil.parseDateTime(argMultimap.getValue(PREFIX_END_DATETIME)).get();
-            Location location = ParserUtil.parseLocation(argMultimap.getValue(PREFIX_LOCATION)).get();
-            Remark remark = ParserUtil.parseRemark(argMultimap.getValue(PREFIX_REMARK)).get();
+            Optional<Location> location = ParserUtil.parseLocation(argMultimap.getValue(PREFIX_LOCATION));
+            Optional<Remark> remark = ParserUtil.parseRemark(argMultimap.getValue(PREFIX_REMARK));
             Set<Tag> tagList = ParserUtil.parseTags(argMultimap.getAllValues(PREFIX_TAG));
 
-            Event event = new Event(name, startDateTime, endDateTime, location, remark, tagList);
+            isTimeRangeValid(startDateTime, endDateTime);
+
+            Event event = new Event(name, startDateTime, endDateTime,
+                    location.isPresent() ? location.get() : null,
+                    remark.isPresent() ? remark.get() : null, tagList);
 
             return new EventCommand(event);
         } catch (IllegalValueException ive) {
@@ -64,5 +71,14 @@ public class EventCommandParser implements Parser<EventCommand> {
      */
     private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
         return Stream.of(prefixes).allMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
+    }
+
+    /**
+     * Throws {@code IllegalValueException} if start datetime is after end datetime.
+     */
+    private static void isTimeRangeValid(DateTime startDateTime, DateTime endDateTime) throws IllegalValueException {
+        if (startDateTime.getLocalDateTime().isAfter(endDateTime.getLocalDateTime())) {
+            throw new IllegalValueException(MESSAGE_INVALID_TIME_RANGE);
+        }
     }
 }

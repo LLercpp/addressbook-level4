@@ -7,7 +7,6 @@ import seedu.address.model.activity.Activity;
 import seedu.address.model.activity.exceptions.ActivityNotFoundException;
 import seedu.address.model.activity.exceptions.DuplicateActivityException;
 
-//@@author YuanQLLer
 /**
  * The API of the Model component.
  */
@@ -24,9 +23,17 @@ public interface Model {
     /** Deletes the given activity. */
     void deleteActivity(Activity target) throws ActivityNotFoundException;
 
+    //@@author Kyomian
+    /** Clear all tasks or all events */
+    void clearActivities(String activityTypeToClear);
+
     /** Adds the given activity */
     void addActivity(Activity activity) throws DuplicateActivityException;
 
+    //@@author karenfrilya97
+    void addActivities(ReadOnlyDeskBoard deskBoard);
+
+    //@@author YuanQQLer
     /**
      * Replaces the given activity {@code target} with {@code editedActivity}.
      *

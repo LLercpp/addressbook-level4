@@ -10,10 +10,11 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
 public class Name {
 
     public static final String MESSAGE_NAME_CONSTRAINTS =
-            "Activity names should only contain alphanumeric characters and spaces, and it should not be blank";
+            "The names of activities should only contain alphanumeric characters and spaces, "
+                    + "and it should not be blank";
 
     /*
-     * The first character of the address must not be a whitespace,
+     * The first character of the name must not be a whitespace,
      * otherwise " " (a blank string) becomes a valid input.
      */
     public static final String NAME_VALIDATION_REGEX = "[\\p{Alnum}][\\p{Alnum} ]*";

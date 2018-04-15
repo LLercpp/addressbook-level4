@@ -26,7 +26,6 @@ import seedu.address.model.util.DateTimeComparator;
  */
 public class UniqueActivityList implements Iterable<Activity> {
 
-    //@@author karenfrilya97
     private static DateTimeComparator dateTimeComparator = new DateTimeComparator();
 
     private final ObservableList<Activity> internalList = FXCollections.observableArrayList();
@@ -41,7 +40,7 @@ public class UniqueActivityList implements Iterable<Activity> {
 
 
     /**
-     * Adds a activity to the list.
+     * Adds an activity to the list.
      * If activity is a task or an event, is added to its respective list.
      *
      * @throws DuplicateActivityException if the activity to add is a duplicate of an existing activity in the list.
@@ -52,7 +51,6 @@ public class UniqueActivityList implements Iterable<Activity> {
             throw new DuplicateActivityException();
         }
         internalList.add(toAdd);
-        //@@author karenfrilya97
         Collections.sort(internalList, dateTimeComparator);
     }
 
@@ -80,16 +78,12 @@ public class UniqueActivityList implements Iterable<Activity> {
         }
 
         internalList.set(index, editedActivity);
-
-        //@@author karenfrilya97
         Collections.sort(internalList, dateTimeComparator);
 
     }
 
     public void setActivity(UniqueActivityList replacement) {
         this.internalList.setAll(replacement.internalList);
-
-        //@@author karenfrilya97
         Collections.sort(internalList, dateTimeComparator);
     }
 
@@ -100,8 +94,6 @@ public class UniqueActivityList implements Iterable<Activity> {
             replacement.add(activity);
         }
         setActivity(replacement);
-
-        //@@author karenfrilya97
         Collections.sort(internalList, dateTimeComparator);
     }
 
@@ -115,11 +107,21 @@ public class UniqueActivityList implements Iterable<Activity> {
         final boolean activityFoundAndDeleted = internalList.remove(toRemove);
         if (!activityFoundAndDeleted) {
             throw new ActivityNotFoundException();
-            //@@author jasmoon
         } else  {
             internalList.remove(toRemove);
         }
         return activityFoundAndDeleted;
+    }
+
+    //@@author Kyomian
+    /**
+     * Clears either all tasks in deskboard or all events.
+     * @param activityTypeToClear
+     */
+    public void clear(String activityTypeToClear) {
+        internalList.removeIf(activity ->
+            activity.getActivityType().equals(activityTypeToClear)
+        );
     }
 
     /**

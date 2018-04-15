@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import seedu.address.model.DeskBoard;
 import seedu.address.model.activity.Activity;
 import seedu.address.model.activity.Event;
@@ -53,11 +55,19 @@ public class TypicalActivities {
     // Manually added
     public static final Task ASSIGNMENT3 = new TaskBuilder().withName("CS2102Assignment")
             .withDateTime("01/04/2018 20:00")
-            .withRemark("nil").build();
+            .withRemark("nil")
+            .withTags("CS2102").build();
+
+    public static final Task OVERDUETASK1 = new TaskBuilder().withName("Overdue task 1").withTags("Overdue").build();
+
+    public static final Task OVERDUETASK2 = new TaskBuilder().withName("Overdue task 2").withTags("Overdue").build();
+
     public static final Event DEMO1 = new EventBuilder().withName("CS2102ProjectDemo")
             .withStartDateTime("04/04/2018 09:00")
             .withEndDateTime("04/04/2018 10:00")
-            .withRemark("FinalDemo").build();
+            .withLocation("COM1")
+            .withRemark("FinalDemo")
+            .withTags("CS2102").build();
 
     public static final String KEYWORD_MATCHING_MEIER = "Meier"; // A keyword that matches MEIER
 
@@ -82,7 +92,20 @@ public class TypicalActivities {
         return new ArrayList<>(Arrays.asList(ASSIGNMENT1, ASSIGNMENT2, QUIZ, CCA, CIP, EXAM1, IFG));
     }
 
-    public static List<Activity> getTypicalTask() {
-        return new ArrayList<>(Arrays.asList(ASSIGNMENT1, ASSIGNMENT2, QUIZ));
+    //@@author Kyomian
+    /**
+     * Returns an {@code ObservableList} of typical tasks.
+     */
+    public static ObservableList<Activity> getTypicalTasks() {
+        List<Activity> taskList = Arrays.asList(ASSIGNMENT1, ASSIGNMENT2, QUIZ);
+        return FXCollections.observableList(taskList);
+    }
+
+    /**
+     * Returns an {@code ObservableList} of typical events.
+     */
+    public static ObservableList<Activity> getTypicalEvents() {
+        List<Activity> eventList = Arrays.asList(CCA, CIP, EXAM1, IFG);
+        return FXCollections.observableList(eventList);
     }
 }

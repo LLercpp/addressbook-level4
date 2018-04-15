@@ -40,7 +40,7 @@ import seedu.address.ui.UiManager;
  */
 public class MainApp extends Application {
 
-    public static final Version VERSION = new Version(1, 4, 0, true);
+    public static final Version VERSION = new Version(1, 5, 0, true);
 
     private static final Logger logger = LogsCenter.getLogger(MainApp.class);
 
@@ -68,7 +68,7 @@ public class MainApp extends Application {
 
         model = initModelManager(storage, userPrefs);
 
-        logic = new LogicManager(model);
+        logic = new LogicManager(model, storage);
 
         ui = new UiManager(logic, config, userPrefs);
 
@@ -82,23 +82,23 @@ public class MainApp extends Application {
 
     /**
      * Returns a {@code ModelManager} with the data from {@code storage}'s desk board and {@code userPrefs}. <br>
-     * The data from the sample address book will be used instead if {@code storage}'s address book is not found,
-     * or an empty address book will be used instead if errors occur when reading {@code storage}'s address book.
+     * The data from the sample desk board will be used instead if {@code storage}'s desk board is not found,
+     * or an empty desk board will be used instead if errors occur when reading {@code storage}'s desk board.
      */
     private Model initModelManager(Storage storage, UserPrefs userPrefs) {
-        Optional<ReadOnlyDeskBoard> addressBookOptional;
+        Optional<ReadOnlyDeskBoard> deskBoardOptional;
         ReadOnlyDeskBoard initialData;
         try {
-            addressBookOptional = storage.readDeskBoard();
-            if (!addressBookOptional.isPresent()) {
-                logger.info("Data file not found. Will be starting with a sample DeskBoard");
+            deskBoardOptional = storage.readDeskBoard();
+            if (!deskBoardOptional.isPresent()) {
+                logger.info("Data file not found. Will be starting with a sample Desk Board");
             }
-            initialData = addressBookOptional.orElseGet(SampleDataUtil::getSampleDeskBoard);
+            initialData = deskBoardOptional.orElseGet(SampleDataUtil::getSampleDeskBoard);
         } catch (DataConversionException e) {
-            logger.warning("Data file not in the correct format. Will be starting with an empty DeskBoard");
+            logger.warning("Data file not in the correct format. Will be starting with an empty Desk Board");
             initialData = new DeskBoard();
         } catch (IOException e) {
-            logger.warning("Problem while reading from the file. Will be starting with an empty DeskBoard");
+            logger.warning("Problem while reading from the file. Will be starting with an empty Desk Board");
             initialData = new DeskBoard();
         }
 

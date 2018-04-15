@@ -3,11 +3,17 @@ package seedu.address.logic.commands;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_DATE_TIME;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_REMARK;
-import static seedu.address.logic.parser.CliSyntax.PREFIX_TAG;
+import static seedu.address.logic.logictestutil.TaskTestConstants.VALID_DATE_TIME_CS2010_QUIZ;
+import static seedu.address.logic.logictestutil.TaskTestConstants.VALID_DATE_TIME_MA2108_HOMEWORK;
+import static seedu.address.logic.logictestutil.TaskTestConstants.VALID_NAME_CS2010_QUIZ;
+import static seedu.address.logic.logictestutil.TaskTestConstants.VALID_NAME_MA2108_HOMEWORK;
+import static seedu.address.logic.logictestutil.TaskTestConstants.VALID_REMARK_CS2010_QUIZ;
+import static seedu.address.logic.logictestutil.TaskTestConstants.VALID_REMARK_MA2108_HOMEWORK;
+import static seedu.address.logic.logictestutil.TaskTestConstants.VALID_TAG_CS2010;
+import static seedu.address.logic.logictestutil.TaskTestConstants.VALID_TAG_MA2108;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,59 +27,30 @@ import seedu.address.model.Model;
 import seedu.address.model.activity.Activity;
 import seedu.address.model.activity.NameContainsKeywordsPredicate;
 import seedu.address.model.activity.exceptions.ActivityNotFoundException;
-import seedu.address.testutil.EditActivityDescriptorBuilder;
+import seedu.address.storage.JsonUserPrefsStorage;
+import seedu.address.storage.Storage;
+import seedu.address.storage.StorageManager;
+import seedu.address.storage.XmlDeskBoardStorage;
+import seedu.address.testutil.EditTaskDescriptorBuilder;
 
 /**
  * Contains helper methods for testing commands.
  */
 public class CommandTestUtil {
 
-    // ============================= TASK =============================================
-    public static final String VALID_NAME_MA2108_HOMEWORK = "MA2108 Homework 3";
-    public static final String VALID_NAME_CS2010_QUIZ = "CS2010 Online Quiz 2";
-    public static final String VALID_DATE_TIME_MA2108_HOMEWORK = "11/11/1111 11:11";
-    public static final String VALID_DATE_TIME_CS2010_QUIZ = "22/12/2222 22:22";
-    public static final String VALID_REMARK_MA2108_HOMEWORK = "3% of total grade";
-    public static final String VALID_REMARK_CS2010_QUIZ = "5% of total grade";
-    public static final String VALID_TAG_MA2108 = "MA2108";
-    public static final String VALID_TAG_CS2010 = "CS2010";
-    //@@author Kyomian
-    public static final String VALID_TAG_URGENT = "Urgent";
-
-    //@@author
-    public static final String NAME_DESC_MA2108_HOMEWORK = " " + PREFIX_NAME + VALID_NAME_MA2108_HOMEWORK;
-    public static final String NAME_DESC_CS2010_QUIZ = " " + PREFIX_NAME + VALID_NAME_CS2010_QUIZ;
-    public static final String DATE_TIME_DESC_MA2108_HOMEWORK = " " + PREFIX_DATE_TIME
-            + VALID_DATE_TIME_MA2108_HOMEWORK;
-    public static final String DATE_TIME_DESC_CS2010_QUIZ = " " + PREFIX_DATE_TIME + VALID_DATE_TIME_CS2010_QUIZ;
-    public static final String REMARK_DESC_MA2108_HOMEWORK = " " + PREFIX_REMARK + VALID_REMARK_MA2108_HOMEWORK;
-    public static final String REMARK_DESC_CS2010_QUIZ = " " + PREFIX_REMARK + VALID_REMARK_CS2010_QUIZ;
-    public static final String TAG_DESC_CS2010 = " " + PREFIX_TAG + VALID_TAG_CS2010;
-    public static final String TAG_DESC_MA2108 = " " + PREFIX_TAG + VALID_TAG_MA2108;
-    //@@author Kyomian
-    public static final String TAG_DESC_URGENT = " " + PREFIX_TAG + VALID_TAG_URGENT;
-
-    public static final String INVALID_TASK_NAME_DESC = " " + PREFIX_NAME + "CS2106 Assignment&"; // '&' not allowed
-    public static final String INVALID_TASK_DATE_TIME_DESC = " " + PREFIX_DATE_TIME + "2018-03-04 17:00";
-    public static final String INVALID_TASK_REMARK_DESC = " " + PREFIX_REMARK + "$"; // '$' not allowed
-    public static final String INVALID_TASK_TAG_DESC = " " + PREFIX_TAG + "CS2106*"; // '*' not allowed in tags
-
-    // ============================= EVENT =============================================
-    //TODO: Tedious
-
     //@@author
     public static final String PREAMBLE_WHITESPACE = "\t  \r  \n";
     public static final String PREAMBLE_NON_EMPTY = "NonEmptyPreamble";
 
-    public static final EditCommand.EditActivityDescriptor DESC_MA2108_HOMEWORK;
+    public static final EditCommand.EditTaskDescriptor DESC_MA2108_HOMEWORK;
     public static final EditCommand.EditActivityDescriptor DESC_CS2010_QUIZ;
 
     static {
-        DESC_MA2108_HOMEWORK = new EditActivityDescriptorBuilder().withName(VALID_NAME_MA2108_HOMEWORK)
-                .withPhone(VALID_DATE_TIME_MA2108_HOMEWORK).withAddress(VALID_REMARK_MA2108_HOMEWORK)
+        DESC_MA2108_HOMEWORK = new EditTaskDescriptorBuilder().withName(VALID_NAME_MA2108_HOMEWORK)
+                .withDateTime(VALID_DATE_TIME_MA2108_HOMEWORK).withRemark(VALID_REMARK_MA2108_HOMEWORK)
                 .withTags(VALID_TAG_CS2010).build();
-        DESC_CS2010_QUIZ = new EditActivityDescriptorBuilder().withName(VALID_NAME_CS2010_QUIZ)
-                .withPhone(VALID_DATE_TIME_CS2010_QUIZ).withAddress(VALID_REMARK_CS2010_QUIZ)
+        DESC_CS2010_QUIZ = new EditTaskDescriptorBuilder().withName(VALID_NAME_CS2010_QUIZ)
+                .withDateTime(VALID_DATE_TIME_CS2010_QUIZ).withRemark(VALID_REMARK_CS2010_QUIZ)
                 .withTags(VALID_TAG_MA2108, VALID_TAG_CS2010).build();
     }
 
@@ -201,5 +178,23 @@ public class CommandTestUtil {
         RedoCommand redoCommand = new RedoCommand();
         redoCommand.setData(model, new CommandHistory(), undoRedoStack);
         return redoCommand;
+    }
+
+    //@@author karenfrilya97
+    /**
+     * Generates file to be imported containing activities in the {@code activityList}
+     * and in the directory {@code filePath}.
+     */
+    public static void createXmlFile(List<Activity> activityList, String filePath) throws IOException {
+        if (new File(filePath).exists()) {
+            new File(filePath).delete();
+        }
+
+        DeskBoard deskBoard = new DeskBoard();
+        deskBoard.addActivities(activityList);
+
+        Storage storage = new StorageManager(new XmlDeskBoardStorage(""),
+                new JsonUserPrefsStorage(""));
+        storage.saveDeskBoard(deskBoard, filePath);
     }
 }

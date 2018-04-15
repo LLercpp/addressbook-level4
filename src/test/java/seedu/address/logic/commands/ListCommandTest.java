@@ -3,14 +3,14 @@ package seedu.address.logic.commands;
 import static org.junit.Assert.assertTrue;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandFailure;
 import static seedu.address.logic.commands.CommandTestUtil.assertCommandSuccess;
+import static seedu.address.logic.commands.CommandTestUtil.showActivityAtIndex;
 import static seedu.address.testutil.TypicalActivities.getTypicalDeskBoard;
+import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_ACTIVITY;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import seedu.address.commons.core.Messages;
-import seedu.address.commons.events.ui.ShowActivityRequestEvent;
 import seedu.address.commons.events.ui.ShowEventOnlyRequestEvent;
 import seedu.address.commons.events.ui.ShowTaskOnlyRequestEvent;
 import seedu.address.logic.CommandHistory;
@@ -37,7 +37,7 @@ public class ListCommandTest {
         model = new ModelManager(getTypicalDeskBoard(), new UserPrefs());
         expectedModel = new ModelManager(model.getDeskBoard(), new UserPrefs());
 
-        listCommand = new ListCommand();
+        listCommand = new ListCommand("");
         listCommand.setData(model, new CommandHistory(), new UndoRedoStack());
     }
 
@@ -46,16 +46,19 @@ public class ListCommandTest {
         assertCommandSuccess(listCommand, model, ListCommand.MESSAGE_SUCCESS, expectedModel);
     }
 
-    /*    public void execute_listIsFiltered_showsEverything() {
+    /**
+     * not sure if needed
+     */
+    public void execute_listIsFiltered_showsEverything() {
         showActivityAtIndex(model, INDEX_FIRST_ACTIVITY);
         assertCommandSuccess(listCommand, model, ListCommand.MESSAGE_SUCCESS, expectedModel);
-
-    }*/
+    }
 
     //@@author jasmoon
     @Test
     public void execute_listForTask_success() {
         ListCommand command = new ListCommand("task");
+        command.setData(model, new CommandHistory(), new UndoRedoStack());
         assertCommandSuccess(command, ListCommand.MESSAGE_SUCCESS_TASK);
         assertTrue(eventsCollectorRule.eventsCollector.getMostRecent() instanceof ShowTaskOnlyRequestEvent);
         assertTrue(eventsCollectorRule.eventsCollector.getSize() == 1);
@@ -64,23 +67,25 @@ public class ListCommandTest {
     @Test
     public void execute_listForEvent_success() {
         ListCommand command = new ListCommand("event");
+        command.setData(model, new CommandHistory(), new UndoRedoStack());
         assertCommandSuccess(command, ListCommand.MESSAGE_SUCCESS_EVENT);
         assertTrue(eventsCollectorRule.eventsCollector.getMostRecent() instanceof ShowEventOnlyRequestEvent);
         assertTrue(eventsCollectorRule.eventsCollector.getSize() == 1);
     }
 
+    /**
+     * Note: Setup is mainView, calling ListCommand("") will not trigger a ShowActivityOnlyRequest Event.
+     */
     @Test
     public void execute_listForActivity_success()    {
-        ListCommand command = new ListCommand();
+        ListCommand command = new ListCommand("");
         assertCommandSuccess(command, ListCommand.MESSAGE_SUCCESS);
-        assertTrue(eventsCollectorRule.eventsCollector.getMostRecent() instanceof ShowActivityRequestEvent);
-        assertTrue(eventsCollectorRule.eventsCollector.getSize() == 1);
+        assertTrue(eventsCollectorRule.eventsCollector.getSize() == 0);
     }
 
     @Test
     public void execute_invalidArgs_throwsCommandException() throws Exception   {
         ListCommand command = new ListCommand("hello");
-        assertCommandFailure(command, String.format(Messages.MESSAGE_INVALID_LIST_REQUEST, "hello"));
+        assertCommandFailure(command, String.format(ListCommand.MESSAGE_INVALID_LIST_REQUEST, "hello"));
     }
-
 }

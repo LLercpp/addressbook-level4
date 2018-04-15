@@ -18,7 +18,7 @@ import seedu.address.model.activity.exceptions.DuplicateActivityException;
 import seedu.address.model.tag.Tag;
 import seedu.address.model.tag.UniqueTagList;
 
-//@@author YuanQLLer
+
 /**
  * Wraps all data at the address-book level
  * Duplicates are not allowed (by .equals comparison)
@@ -94,6 +94,26 @@ public class DeskBoard implements ReadOnlyDeskBoard {
         activities.add(activity);
     }
 
+    //@@author karenfrilya97
+    /**
+     * Adds all activities from UniqueActivityList {@code activities} to the desk board.
+     * Also checks each new activity's tags and updates {@link #tags} with any new tags found,
+     * and updates the Tag objects in the activity to point to those in {@link #tags}.
+     *
+     * If an equivalent activity already exists, that activity will be ignored.
+     */
+    public void addActivities(List<Activity> toAdd) {
+        for (Activity activity : toAdd) {
+            activity = syncWithMasterTagList(activity);
+            try {
+                activities.add(activity);
+            } catch (DuplicateActivityException e) {
+                // Ignore duplicate activity.
+            }
+        }
+    }
+
+    //@@author YuanQLLer
     /**
      * Replaces the given activity {@code target} in the list with {@code editedActivity}.
      * {@code DeskBoard}'s tag list will be updated with the tags of {@code editedActivity}.
@@ -135,6 +155,7 @@ public class DeskBoard implements ReadOnlyDeskBoard {
         return activity.copy(correctTagReferences);
     }
 
+    //@@author Kyomian
     /**
      * Removes {@code key} from this {@code DeskBoard}.
      * @throws ActivityNotFoundException if the {@code key} is not in this {@code DeskBoard}.
@@ -147,8 +168,13 @@ public class DeskBoard implements ReadOnlyDeskBoard {
         }
     }
 
+    public void clearActivities(String activityTypeToClear) {
+        activities.clear(activityTypeToClear);
+    }
+
     //// tag-level operations
 
+    //@@author
     public void addTag(Tag t) throws UniqueTagList.DuplicateTagException {
         tags.add(t);
     }
